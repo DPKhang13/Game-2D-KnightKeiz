@@ -7,7 +7,8 @@ TagManager:
   - Coin
   - Trap
   - Enemy
-  - Key
+  - Checkspawn
+  - Portal
   layers:
   - Default
   - TransparentFX
@@ -59,6 +60,9 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 323444873
+    locked: 0
+  - name: Portal
+    uniqueID: 2182035679
     locked: 0
   - name: Item
     uniqueID: 2709608759

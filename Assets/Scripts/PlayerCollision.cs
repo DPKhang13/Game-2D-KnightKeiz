@@ -21,17 +21,10 @@ public class PlayerCollision : MonoBehaviour
         else if (collision.CompareTag("Trap"))
         {
             gameManager.GameOver();
-            // Implement game over logic here (e.g., restart level, show game over screen)
         }
         else if (collision.CompareTag("Enemy"))
         {
-            gameManager.GameOver();
-            // Implement game over logic here (e.g., restart level, show game over screen)
-        }
-        else if (collision.CompareTag("Key"))
-        {
-            Destroy(collision.gameObject);
-            gameManager.GameWin();
+            //gameManager.GameOver();
         }
     }
 }

@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
+    [SerializeField] private float pitThreshold = -10f; // Y position below which is considered a pit
     private Animator animator;
     private bool isGrounded;
     private Rigidbody2D rb;
@@ -22,7 +23,28 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        Health health = GetComponent<Health>();
+        if (health != null)
+        {
+            health.OnDied += OnPlayerDied;
+        }
+    }
 
+    private void OnPlayerDied(Health health)
+    {
+        if (gameManager != null)
+        {
+            gameManager.GameOver();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        Health health = GetComponent<Health>();
+        if (health != null)
+        {
+            health.OnDied -= OnPlayerDied;
+        }
     }
 
     // Update is called once per frame
@@ -32,6 +54,7 @@ public class PlayerController : MonoBehaviour
         {
             return; // Skip movement and animation updates if the game is over
         }
+        CheckForPit();
         HandleMovement();
         HandleJump();
         UpdateAnimations();
@@ -52,18 +75,28 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJump()
     {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             audioManager.PlayJumpSound();
         }
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
     }
+
     private void UpdateAnimations()
     {
         bool isRunning = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
         animator.SetBool("isRunning", isRunning);
         bool isJumping = !isGrounded;
         animator.SetBool("isJumping", isJumping);
+    }
+
+    private void CheckForPit()
+    {
+        if (transform.position.y < pitThreshold)
+        {
+            gameManager.RespawnAtCheckpoint();
+        }
     }
 }
