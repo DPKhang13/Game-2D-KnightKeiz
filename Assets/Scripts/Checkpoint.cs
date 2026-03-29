@@ -4,31 +4,50 @@ public class Checkpoint : MonoBehaviour
 {
     private GameManager gameManager;
 
+    private void Awake()
+    {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        }
+
+        rb.gravityScale = 0;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+    }
+
     private void Start()
     {
-        // Ensure the collider is set as trigger
         Collider2D col = GetComponent<Collider2D>();
         if (col != null && !col.isTrigger)
         {
-            Debug.LogWarning($"Checkpoint {gameObject.name} collider is not set as trigger!");
+            col.isTrigger = true;
         }
 
         gameManager = FindAnyObjectByType<GameManager>();
-        Debug.Log($"Checkpoint {gameObject.name} initialized at position {transform.position}");
+        if (gameManager == null)
+        {
+            Debug.LogError($"Checkpoint '{gameObject.name}' could not find GameManager!");
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            if (gameManager == null)
-            {
-                gameManager = FindAnyObjectByType<GameManager>();
-            }
-
             if (gameManager != null)
             {
-                Debug.Log($"Checkpoint reached at position {transform.position}");
+                gameManager.SetCheckpoint(transform.position);
+            }
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            if (gameManager != null)
+            {
                 gameManager.SetCheckpoint(transform.position);
             }
         }
